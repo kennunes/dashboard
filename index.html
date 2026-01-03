@@ -1,0 +1,472 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  Zap, 
+  Droplets, 
+  Sun, 
+  Moon, 
+  Info, 
+  Search, 
+  BarChart3, 
+  Map as MapIcon,
+  LayoutDashboard,
+  FileText,
+  MousePointerClick,
+  MapPin,
+  Crosshair,
+  ArrowLeft,
+  Download,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle2,
+  DollarSign,
+  Calendar
+} from 'lucide-react';
+
+// --- CONSTANTS & MOCK DATA GENERATION ---
+
+const STATUS_COLORS = {
+  RED: '#ef4444',
+  YELLOW: '#f59e0b',
+  GREEN: '#22c55e',
+  GREY: '#94a3b8'
+};
+
+const generateSchools = () => {
+  const schools = [];
+  const totalActive = 56; 
+  const totalInactive = 20;
+
+  const getSafeCoords = (isPrimary) => ({
+    x: 50 + (Math.random() - 0.5) * 85,
+    y: 50 + (Math.random() - 0.5) * 85
+  });
+
+  for (let i = 0; i < totalActive; i++) {
+    const isPrimary = Math.random() < 0.8;
+    const type = isPrimary ? 'Primary' : 'High';
+    
+    let elecStatus = Math.random() < 0.4 ? 'RED' : (Math.random() < 0.7 ? 'YELLOW' : 'GREEN');
+    let waterStatus = Math.random() < 0.5 ? 'RED' : (Math.random() < 0.8 ? 'YELLOW' : 'GREEN');
+
+    schools.push({
+      id: `school-${i}`,
+      name: `${type === 'Primary' ? 'Northcliff' : 'Johannesburg'} ${i + 1} ${type}`,
+      type,
+      active: true,
+      coords: getSafeCoords(isPrimary),
+      elecStatus,
+      waterStatus,
+      grade: elecStatus === 'GREEN' ? 'A' : (elecStatus === 'YELLOW' ? 'B-' : 'D+'),
+      consumption: {
+        elec: Math.floor(Math.random() * 5000) + 2000,
+        water: Math.floor(Math.random() * 1000) + 500,
+        monthlyHistory: [45, 52, 48, 70, 85, 92, 88, 72, 60, 55, 42, 40] // 12 month % usage
+      }
+    });
+  }
+
+  for (let i = 0; i < totalInactive; i++) {
+    schools.push({
+      id: `inactive-${i}`,
+      name: `Facility #${i + 400} (Unregistered)`,
+      type: 'Secondary',
+      active: false,
+      coords: getSafeCoords(false),
+      elecStatus: 'GREY',
+      waterStatus: 'GREY'
+    });
+  }
+  return schools;
+};
+
+const MOCK_SCHOOLS = generateSchools();
+
+// --- COMPONENTS ---
+
+// Fixed missing CustomPin component
+const CustomPin = ({ color, isActive, isRed, onClick, onMouseEnter, onMouseLeave }) => (
+  <div 
+    className="relative cursor-pointer transition-transform duration-200 hover:scale-125 z-10 hover:z-40"
+    onClick={onClick}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+  >
+    {/* Toned down Pulse effect for RED status pins (30% reduction in intensity) */}
+    {isRed && (
+      <>
+        {/* Primary Ping - Low Opacity */}
+        <div 
+          className="absolute inset-[-6px] rounded-full animate-ping opacity-[0.12]"
+          style={{ backgroundColor: color }}
+        />
+        {/* Soft Glow */}
+        <div 
+          className="absolute inset-[-3px] rounded-full animate-pulse opacity-[0.08] blur-sm"
+          style={{ backgroundColor: color }}
+        />
+      </>
+    )}
+    
+    <svg 
+      width="24" 
+      height="30" 
+      viewBox="0 0 24 30" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className="drop-shadow-lg"
+    >
+      <path 
+        d="M12 0C5.37 0 0 5.37 0 12C0 21 12 30 12 30C12 30 24 21 24 12C24 5.37 18.63 0 12 0Z" 
+        fill={color}
+      />
+      <circle cx="12" cy="12" r="5" fill="white" fillOpacity={isActive ? "0.85" : "0.3"} />
+    </svg>
+  </div>
+);
+
+const DetailedReport = ({ school, onBack, darkMode }) => {
+  return (
+    <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Report Header */}
+      <div className="flex justify-between items-center mb-8">
+        <button 
+          onClick={onBack}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${darkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'}`}
+        >
+          <ArrowLeft size={18} />
+          <span className="font-bold text-sm uppercase tracking-wider">Back to Map</span>
+        </button>
+        <div className="flex gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 transition-all">
+            <Download size={18} />
+            Export PDF
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-12 gap-6 overflow-y-auto pr-2 pb-12">
+        {/* Profile Card */}
+        <div className={`col-span-12 lg:col-span-4 p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className="flex flex-col items-center text-center">
+            <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mb-6 text-4xl font-black ${school.elecStatus === 'GREEN' ? 'bg-green-500/10 text-green-500' : school.elecStatus === 'YELLOW' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>
+              {school.grade}
+            </div>
+            <h2 className="text-2xl font-black mb-1">{school.name}</h2>
+            <span className="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">
+              {school.type} INSTITUTION
+            </span>
+            
+            <div className="w-full space-y-4">
+              <div className="flex justify-between p-4 rounded-2xl bg-slate-800/30">
+                <span className="text-xs font-bold text-slate-500 uppercase">Efficiency Rank</span>
+                <span className="text-xs font-black">Top 15% in District</span>
+              </div>
+              <div className="flex justify-between p-4 rounded-2xl bg-slate-800/30">
+                <span className="text-xs font-bold text-slate-500 uppercase">Audit Period</span>
+                <span className="text-xs font-black">Jan - Dec 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Financial Impact */}
+        <div className={`col-span-12 lg:col-span-8 p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Financial Impact Analysis</h3>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <p className="text-slate-500 text-[10px] font-bold uppercase">Total Spend (Annual)</p>
+              <p className="text-3xl font-black">R{((school.consumption.elec * 2.8) * 12).toLocaleString()}</p>
+              <div className="flex items-center gap-1 text-red-500 text-xs font-bold">
+                <TrendingUp size={14} /> +8.2% vs 2024
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-slate-500 text-[10px] font-bold uppercase">Efficiency Savings Goal</p>
+              <p className="text-3xl font-black text-green-500">R{(school.consumption.elec * 4).toLocaleString()}</p>
+              <p className="text-slate-500 text-[10px]">Potential monthly reduction</p>
+            </div>
+            <div className="flex items-center justify-center border-l border-slate-800 pl-6">
+               <div className="text-center">
+                  <div className="w-16 h-16 rounded-full border-4 border-orange-500 border-t-transparent animate-spin-slow flex items-center justify-center">
+                    <span className="text-xs font-bold">12%</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase">Wastage Gap</p>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trends Chart Simulation */}
+        <div className={`col-span-12 p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">12-Month Consumption Trend (kWh)</h3>
+            <div className="flex gap-2">
+              <div className="flex items-center gap-2 text-[10px] font-bold"><div className="w-2 h-2 rounded-full bg-orange-500" /> Usage</div>
+              <div className="flex items-center gap-2 text-[10px] font-bold"><div className="w-2 h-2 rounded-full bg-slate-700" /> Benchmark</div>
+            </div>
+          </div>
+          <div className="h-48 flex items-end gap-2 px-2">
+            {school.consumption.monthlyHistory.map((val, idx) => (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-2 group relative">
+                <div 
+                  className={`w-full rounded-t-lg transition-all duration-1000 ${school.elecStatus === 'RED' ? 'bg-red-500/60 hover:bg-red-500' : 'bg-orange-500/60 hover:bg-orange-500'}`}
+                  style={{ height: `${val}%` }}
+                />
+                <span className="text-[9px] font-bold text-slate-500 uppercase">{['J','F','M','A','M','J','J','A','S','O','N','D'][idx]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Insights & Anomalies */}
+        <div className="col-span-12 lg:col-span-6 space-y-4">
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 ml-4">Critical Alerts</h3>
+          <div className={`p-6 rounded-3xl border border-red-500/20 bg-red-500/5 flex gap-4`}>
+             <AlertTriangle className="text-red-500 shrink-0" size={24} />
+             <div>
+               <h4 className="text-sm font-bold text-red-500 mb-1">Night Baseline Anomaly</h4>
+               <p className="text-xs text-slate-400 leading-relaxed">System detected consumption of 4.2kWh between 01:00 AM - 04:00 AM. Suggests HVAC or lighting equipment left active in Block C.</p>
+             </div>
+          </div>
+          <div className={`p-6 rounded-3xl border border-amber-500/20 bg-amber-500/5 flex gap-4`}>
+             <TrendingUp className="text-amber-500 shrink-0" size={24} />
+             <div>
+               <h4 className="text-sm font-bold text-amber-500 mb-1">Peak Demand Spike</h4>
+               <p className="text-xs text-slate-400 leading-relaxed">Monthly peak recorded at 07:45 AM during kitchen start-up. Consider staggered appliance activation to reduce KVA charges.</p>
+             </div>
+          </div>
+        </div>
+
+        {/* Action Plan */}
+        <div className="col-span-12 lg:col-span-6 space-y-4">
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 ml-4">Recommended Actions</h3>
+          <div className={`p-6 rounded-3xl border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} flex gap-4 items-center`}>
+             <CheckCircle2 className="text-green-500 shrink-0" size={24} />
+             <div className="flex-1">
+               <h4 className="text-sm font-bold mb-1">Install Smart Timers: Block B</h4>
+               <div className="w-full bg-slate-800 h-1 rounded-full mt-2"><div className="bg-green-500 h-full w-3/4" /></div>
+             </div>
+             <span className="text-[10px] font-black text-green-500">75% ROI</span>
+          </div>
+          <div className={`p-6 rounded-3xl border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} flex gap-4 items-center`}>
+             <CheckCircle2 className="text-slate-600 shrink-0" size={24} />
+             <div className="flex-1">
+               <h4 className="text-sm font-bold mb-1">HVAC Maintenance Review</h4>
+               <div className="w-full bg-slate-800 h-1 rounded-full mt-2"><div className="bg-slate-700 h-full w-1/4" /></div>
+             </div>
+             <span className="text-[10px] font-black text-slate-500">20% ROI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN APP COMPONENT ---
+
+const App = () => {
+  const [darkMode, setDarkMode] = useState(true);
+  const [mapType, setMapType] = useState('electricity');
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [hoveredSchool, setHoveredSchool] = useState(null);
+  const [view, setView] = useState('map'); // 'map' or 'report'
+
+  const activeStats = { total: 1152, active: 103, uploaded: 54 };
+
+  const handleOpenReport = () => {
+    if (selectedSchool?.active) setView('report');
+  };
+
+  return (
+    <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} font-sans transition-colors duration-300`}>
+      
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 border-r ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} z-50`}>
+        <div className="mb-12">
+          <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <Sun className="text-white w-8 h-8" />
+          </div>
+        </div>
+        <nav className="space-y-8 flex-1">
+          <button onClick={() => setView('map')} className={`p-3 rounded-xl transition-all ${view === 'map' ? 'bg-orange-500/10 text-orange-500' : 'text-slate-400 hover:text-orange-500'}`}><LayoutDashboard size={24} /></button>
+          <button className="p-3 text-slate-400 hover:text-orange-500 transition-colors"><MapIcon size={24} /></button>
+          <button className="p-3 text-slate-400 hover:text-orange-500 transition-colors"><FileText size={24} /></button>
+          <button className="p-3 text-slate-400 hover:text-orange-500 transition-colors"><BarChart3 size={24} /></button>
+        </nav>
+        <button 
+          onClick={() => setDarkMode(!darkMode)}
+          className={`p-3 rounded-full transition-all group ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-200 text-slate-600'}`}
+        >
+          {darkMode ? <Sun size={20} className="group-hover:rotate-45 transition-transform" /> : <Moon size={20} />}
+        </button>
+      </aside>
+
+      <main className="pl-20 flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Header */}
+        <header className="px-8 py-6 flex justify-between items-center border-b border-slate-800/10">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight uppercase tracking-widest">Efficiency Indicator</h1>
+            <p className="text-slate-500 text-sm mt-1">
+              Platform Status: <span className="text-orange-500 font-bold">{view === 'map' ? 'Global Network View' : 'Facility Deep Dive'}</span>
+            </p>
+          </div>
+
+          {view === 'map' && (
+            <div className={`flex rounded-xl p-1.5 ${darkMode ? 'bg-slate-900' : 'bg-slate-200'}`}>
+              <button 
+                onClick={() => setMapType('electricity')}
+                className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${mapType === 'electricity' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500'}`}
+              >
+                <Zap size={18} />
+                <span className="font-bold text-sm">Electricity</span>
+              </button>
+              <button 
+                onClick={() => setMapType('water')}
+                className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${mapType === 'water' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500'}`}
+              >
+                <Droplets size={18} />
+                <span className="font-bold text-sm">Water</span>
+              </button>
+            </div>
+          )}
+        </header>
+
+        {/* Dynamic Workspace */}
+        <div className="flex-1 p-8 grid grid-cols-12 gap-8 overflow-hidden">
+          
+          <div className="col-span-9 h-full relative overflow-hidden">
+            {view === 'map' ? (
+              <div className="h-full relative rounded-[2.5rem] overflow-hidden border border-slate-800/20 shadow-2xl bg-[#0f172a]">
+                <div className={`absolute inset-0 transition-colors duration-500 ${darkMode ? 'bg-[#0f172a]' : 'bg-[#f1f5f9]'}`}>
+                  <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#64748b 1px, transparent 1px), linear-gradient(90deg, #64748b 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center opacity-20 pointer-events-none">
+                    <Crosshair size={40} className="text-slate-500" />
+                    <span className="text-[10px] font-black uppercase tracking-widest mt-2">Northcliff Region</span>
+                  </div>
+
+                  <div className="relative w-full h-full p-4">
+                    {MOCK_SCHOOLS.map(school => {
+                      const statusKey = mapType === 'electricity' ? school.elecStatus : school.waterStatus;
+                      return (
+                        <div key={school.id} className="absolute transform -translate-x-1/2 -translate-y-full" style={{ left: `${school.coords.x}%`, top: `${school.coords.y}%` }}>
+                          <CustomPin 
+                            color={STATUS_COLORS[statusKey]} 
+                            isActive={school.active} 
+                            isRed={statusKey === 'RED'} 
+                            onClick={() => setSelectedSchool(school)}
+                            onMouseEnter={() => setHoveredSchool(school)}
+                            onMouseLeave={() => setHoveredSchool(null)}
+                          />
+                          {hoveredSchool?.id === school.id && (
+                            <div className={`absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-3 w-56 p-4 rounded-2xl shadow-2xl border z-[100] backdrop-blur-md ${darkMode ? 'bg-slate-900/95 border-slate-700' : 'bg-white/95 border-slate-200'}`}>
+                              <p className="text-[10px] font-black text-slate-500 uppercase mb-1 tracking-widest">{school.type} School</p>
+                              <p className="text-xs font-bold mb-3 truncate">{school.name}</p>
+                              {school.active ? (
+                                <div className="flex justify-between items-center bg-slate-800/20 p-2 rounded-lg">
+                                  <span className="text-[10px] text-slate-500 font-bold uppercase">View Deep Audit</span>
+                                  <ArrowLeft className="rotate-180" size={10} />
+                                </div>
+                              ) : (
+                                <button className="w-full bg-orange-500 text-white text-[10px] font-black py-2 rounded-xl flex items-center justify-center gap-2">CLAIM SCHOOL</button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {/* Legend */}
+                <div className={`absolute bottom-8 left-8 p-6 rounded-3xl border shadow-2xl z-50 ${darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'} backdrop-blur-lg`}>
+                  <h4 className="text-[10px] font-black uppercase tracking-tighter text-slate-500 mb-4">Indicator Keys</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3"><div className="relative"><div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/40" /><div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-20" /></div><span className="text-[11px] font-bold uppercase tracking-tight">Above Average (RED)</span></div>
+                    <div className="flex items-center gap-3"><div className="w-3 h-3 rounded-full bg-amber-500" /><span className="text-[11px] font-bold uppercase tracking-tight">Requires Attention (YELLOW)</span></div>
+                    <div className="flex items-center gap-3"><div className="w-3 h-3 rounded-full bg-green-500" /><span className="text-[11px] font-bold uppercase tracking-tight">Efficient (GREEN)</span></div>
+                    <hr className="border-slate-800/50" />
+                    <div className="flex items-center gap-3 opacity-60"><div className="w-3 h-3 rounded-full bg-slate-400" /><span className="text-[11px] font-bold italic tracking-tight uppercase">NOT PRESENTLY IN DATABASE</span></div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <DetailedReport school={selectedSchool} onBack={() => setView('map')} darkMode={darkMode} />
+            )}
+          </div>
+
+          {/* Sidebar Analytics - Only visible in Map view or as a mini-sidebar in Report */}
+          <div className="col-span-3 flex flex-col h-full gap-6 overflow-hidden">
+            <div className={`p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-black text-xs uppercase tracking-widest text-slate-500">Coverage</h3>
+                <div className="p-2 bg-orange-500/10 text-orange-500 rounded-xl"><BarChart3 size={18} /></div>
+              </div>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-4xl font-black text-orange-500">{activeStats.active}</span>
+                <span className="text-slate-500 text-xs font-bold uppercase">/ {activeStats.total}</span>
+              </div>
+              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div className="bg-orange-500 h-full transition-all duration-1000" style={{ width: `${(activeStats.active / activeStats.total) * 100}%` }} />
+              </div>
+            </div>
+
+            <div className={`flex-1 p-8 rounded-[2.5rem] border transition-all overflow-y-auto ${selectedSchool ? (darkMode ? 'bg-slate-900 border-orange-500/30' : 'bg-white border-orange-200 shadow-xl') : (darkMode ? 'bg-slate-900/20 border-slate-800' : 'bg-slate-100 border-slate-300')}`}>
+              {selectedSchool ? (
+                <div className="h-full flex flex-col">
+                  <div className="flex items-start gap-4 mb-8">
+                    <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
+                      {selectedSchool.active ? <Sun className="text-orange-500" size={28} /> : <MapPin className="text-slate-500" size={28} />}
+                    </div>
+                    <div className="overflow-hidden">
+                      <h4 className="font-black text-lg leading-tight truncate">{selectedSchool.name}</h4>
+                      <p className="text-[10px] text-slate-500 font-black uppercase mt-2 tracking-widest bg-slate-800 inline-block px-2 py-1 rounded-md">{selectedSchool.type} School</p>
+                    </div>
+                  </div>
+
+                  {selectedSchool.active ? (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                          <p className="text-[9px] font-black text-slate-500 uppercase mb-1">kWh</p>
+                          <p className="font-black text-lg">{selectedSchool.consumption.elec.toLocaleString()}</p>
+                        </div>
+                        <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                          <p className="text-[9px] font-black text-slate-500 uppercase mb-1">kL</p>
+                          <p className="font-black text-lg">{selectedSchool.consumption.water.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="p-5 rounded-3xl bg-orange-500/5 border border-orange-500/10">
+                        <h5 className="text-[10px] font-black uppercase text-orange-500 mb-2 flex items-center gap-2">Efficiency Rating: {selectedSchool.grade}</h5>
+                        <p className="text-xs text-slate-400 font-medium">Currently {selectedSchool.elecStatus === 'RED' ? 'performing below' : 'meeting'} the area standard.</p>
+                      </div>
+                      <button 
+                        onClick={handleOpenReport}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest mt-auto shadow-lg shadow-orange-500/20"
+                      >
+                        Open Full Audit Report
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center">
+                      <div className="w-16 h-16 bg-slate-800/30 rounded-full flex items-center justify-center mb-6 border border-slate-700 border-dashed">
+                        <Search size={24} className="text-slate-600" />
+                      </div>
+                      <h5 className="font-black text-sm mb-2">Registration Pending</h5>
+                      <button className="w-full bg-orange-500 text-white font-black py-4 rounded-2xl transition-all text-[10px]">CLAIM SCHOOL</button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center px-6">
+                  <MapIcon size={24} className="text-slate-700 mb-4" />
+                  <p className="text-[10px] text-slate-500 leading-relaxed uppercase font-bold tracking-tight">Select a facility marker to analyze consumption data.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default App;
