@@ -18,7 +18,7 @@
         .animate-spin-slow {
             animation: spin-slow 8s linear infinite;
         }
-        /* Custom scrollbar for a premium look */
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -141,43 +141,57 @@
 
         const DetailedReport = ({ school, onBack, darkMode }) => (
             <div className="flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex justify-between items-center mb-8 shrink-0">
-                    <button onClick={onBack} className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${darkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'}`}>
+                <div className="flex justify-between items-center mb-6 lg:mb-8 shrink-0">
+                    <button onClick={onBack} className={`flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl transition-all ${darkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'}`}>
                         <Icon name="ArrowLeft" size={18} />
-                        <span className="font-bold text-sm uppercase tracking-wider">Back to Map</span>
+                        <span className="font-bold text-xs lg:text-sm uppercase tracking-wider">Back</span>
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20">
-                        <Icon name="Download" size={18} /> Export PDF
+                    <button className="flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl bg-orange-500 text-white font-bold text-xs lg:text-sm hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20">
+                        <Icon name="Download" size={18} /> <span className="hidden sm:inline">Export PDF</span>
                     </button>
                 </div>
-                <div className="flex-1 grid grid-cols-12 gap-6 overflow-y-auto pr-2 pb-12">
-                    <div className={`col-span-12 lg:col-span-4 p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <div className="flex-1 grid grid-cols-12 gap-4 lg:gap-6 overflow-y-auto pr-2 pb-24 lg:pb-12">
+                    <div className={`col-span-12 lg:col-span-4 p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                         <div className="flex flex-col items-center text-center">
-                            <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mb-6 text-4xl font-black ${school.elecStatus === 'GREEN' ? 'text-green-500 bg-green-500/10' : school.elecStatus === 'YELLOW' ? 'text-amber-500 bg-amber-500/10' : 'text-red-500 bg-red-500/10'}`}>{school.grade}</div>
-                            <h2 className="text-2xl font-black mb-1">{school.name}</h2>
-                            <span className="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">{school.type} INSTITUTION</span>
-                            <div className="w-full space-y-4">
-                                <div className="flex justify-between p-4 rounded-2xl bg-slate-800/30"><span className="text-xs font-bold text-slate-500 uppercase">Efficiency Rank</span><span className="text-xs font-black">Top 15% in District</span></div>
+                            <div className={`w-20 h-20 lg:w-24 lg:h-24 rounded-3xl flex items-center justify-center mb-4 lg:mb-6 text-3xl lg:text-4xl font-black ${school.elecStatus === 'GREEN' ? 'text-green-500 bg-green-500/10' : school.elecStatus === 'YELLOW' ? 'text-amber-500 bg-amber-500/10' : 'text-red-500 bg-red-500/10'}`}>{school.grade}</div>
+                            <h2 className="text-xl lg:text-2xl font-black mb-1">{school.name}</h2>
+                            <span className="px-3 py-1 bg-slate-800 rounded-full text-[9px] lg:text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">{school.type} INSTITUTION</span>
+                            <div className="w-full space-y-3">
+                                <div className="flex justify-between p-4 rounded-2xl bg-slate-800/30 font-bold uppercase tracking-tighter text-[10px] lg:text-xs">
+                                    <span className="text-slate-500">Efficiency Rank</span>
+                                    <span>Top 15%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className={`col-span-12 lg:col-span-8 p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Financial Impact Analysis</h3>
-                        <div className="grid grid-cols-3 gap-6">
-                            <div className="space-y-2"><p className="text-slate-500 text-[10px] font-bold uppercase">Total Spend (Annual)</p><p className="text-3xl font-black">R{((school.consumption.elec * 2.8) * 12).toLocaleString()}</p></div>
-                            <div className="space-y-2"><p className="text-slate-500 text-[10px] font-bold uppercase">Efficiency Savings Goal</p><p className="text-3xl font-black text-green-500">R{(school.consumption.elec * 4).toLocaleString()}</p></div>
-                            <div className="flex items-center justify-center border-l border-slate-800 pl-6 text-center">
-                                <div><div className="w-16 h-16 rounded-full border-4 border-orange-500 border-t-transparent animate-spin-slow flex items-center justify-center"><span className="text-xs font-bold">12%</span></div><p className="text-[10px] font-bold text-slate-500 mt-2 uppercase">Wastage Gap</p></div>
+                    <div className={`col-span-12 lg:col-span-8 p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                        <h3 className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Financial Impact</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div className="space-y-2">
+                                <p className="text-slate-500 text-[10px] font-bold uppercase">Total Spend (Annual)</p>
+                                <p className="text-2xl lg:text-3xl font-black">R{((school.consumption.elec * 2.8) * 12).toLocaleString()}</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-slate-500 text-[10px] font-bold uppercase">Savings Goal</p>
+                                <p className="text-2xl lg:text-3xl font-black text-green-500">R{(school.consumption.elec * 4).toLocaleString()}</p>
+                            </div>
+                            <div className="flex items-center justify-start sm:justify-center border-t sm:border-t-0 sm:border-l border-slate-800 pt-4 sm:pt-0 sm:pl-6 text-center">
+                                <div className="flex items-center gap-4 sm:block">
+                                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-4 border-orange-500 border-t-transparent animate-spin-slow flex items-center justify-center">
+                                        <span className="text-[10px] font-bold">12%</span>
+                                    </div>
+                                    <p className="text-[9px] lg:text-[10px] font-bold text-slate-500 mt-2 uppercase">Wastage Gap</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className={`col-span-12 p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-8">12-Month Consumption Trend</h3>
-                        <div className="h-48 flex items-end gap-2 px-2">
+                    <div className={`col-span-12 p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                        <h3 className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-slate-500 mb-8">Consumption Trend</h3>
+                        <div className="h-40 lg:h-48 flex items-end gap-1.5 lg:gap-2 px-2">
                             {school.consumption.monthlyHistory.map((val, idx) => (
                                 <div key={idx} className="flex-1 flex flex-col items-center gap-2 group relative">
                                     <div className={`w-full rounded-t-lg transition-all duration-1000 ${school.elecStatus === 'RED' ? 'bg-red-500/60' : 'bg-orange-500/60'}`} style={{ height: `${val}%` }} />
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase">{['J','F','M','A','M','J','J','A','S','O','N','D'][idx]}</span>
+                                    <span className="text-[8px] lg:text-[9px] font-bold text-slate-500 uppercase">{['J','F','M','A','M','J','J','A','S','O','N','D'][idx]}</span>
                                 </div>
                             ))}
                         </div>
@@ -198,37 +212,62 @@
 
             return (
                 <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} font-sans transition-colors duration-300`}>
-                    <aside className={`fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 border-r ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} z-50`}>
-                        <div className="mb-12"><div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><Icon name="Sun" size={32} className="text-white" /></div></div>
-                        <nav className="space-y-8 flex-1">
-                            <button onClick={() => setView('map')} className={`p-3 rounded-xl transition-all ${view === 'map' ? 'bg-orange-500/10 text-orange-500' : 'text-slate-400 hover:text-orange-500'}`}><Icon name="LayoutDashboard" size={24} /></button>
-                            <button className="p-3 text-slate-400 hover:text-orange-500 transition-colors"><Icon name="Map" size={24} /></button>
-                            <button className="p-3 text-slate-400 hover:text-orange-500 transition-colors"><Icon name="FileText" size={24} /></button>
-                            <button className="p-3 text-slate-400 hover:text-orange-500 transition-colors"><Icon name="BarChart3" size={24} /></button>
+                    
+                    {/* Navigation: Sidebar (Desktop) / Bottom Bar (Mobile) */}
+                    <aside className={`fixed z-50 flex border-slate-800 transition-all
+                        bottom-0 left-0 w-full h-16 flex-row justify-around items-center px-4 border-t bg-slate-900/80 backdrop-blur-md
+                        lg:top-0 lg:w-20 lg:h-full lg:flex-col lg:justify-start lg:py-8 lg:border-t-0 lg:border-r ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                        
+                        <div className="hidden lg:flex lg:mb-12">
+                            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><Icon name="Sun" size={32} className="text-white" /></div>
+                        </div>
+                        
+                        <nav className="flex flex-row lg:flex-col gap-6 sm:gap-10 lg:gap-8 lg:flex-1">
+                            <button onClick={() => setView('map')} className={`p-2 lg:p-3 rounded-xl transition-all ${view === 'map' ? 'bg-orange-500/10 text-orange-500' : 'text-slate-400 hover:text-orange-500'}`}><Icon name="LayoutDashboard" size={24} /></button>
+                            <button className="p-2 lg:p-3 text-slate-400 hover:text-orange-500 transition-colors"><Icon name="Map" size={24} /></button>
+                            <button className="p-2 lg:p-3 text-slate-400 hover:text-orange-500 transition-colors"><Icon name="FileText" size={24} /></button>
+                            <button className="p-2 lg:p-3 text-slate-400 hover:text-orange-500 transition-colors"><Icon name="BarChart3" size={24} /></button>
                         </nav>
-                        <button onClick={() => setDarkMode(!darkMode)} className={`p-3 rounded-full transition-all group ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-200 text-slate-600'}`}>
+                        
+                        <button onClick={() => setDarkMode(!darkMode)} className={`p-2 lg:p-3 rounded-full transition-all group ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-200 text-slate-600'}`}>
                             {darkMode ? <Icon name="Sun" size={20} className="group-hover:rotate-45 transition-transform" /> : <Icon name="Moon" size={20} />}
                         </button>
                     </aside>
 
-                    <main className="pl-20 flex-1 flex flex-col h-screen overflow-hidden">
-                        <header className="px-8 py-6 flex justify-between items-center border-b border-slate-800/10">
-                            <div><h1 className="text-2xl font-bold tracking-tight uppercase tracking-widest">Efficiency Indicator</h1><p className="text-slate-500 text-sm mt-1">Platform Status: <span className="text-orange-500 font-bold">{view === 'map' ? 'Global Network View' : 'Facility Deep Dive'}</span></p></div>
+                    <main className="flex-1 flex flex-col h-screen overflow-hidden lg:pl-20">
+                        {/* Header */}
+                        <header className="px-4 lg:px-8 py-4 lg:py-6 flex justify-between items-center border-b border-slate-800/10 shrink-0">
+                            <div>
+                                <h1 className="text-lg lg:text-2xl font-bold tracking-tight uppercase tracking-widest leading-none">Efficiency</h1>
+                                <p className="text-slate-500 text-[10px] lg:text-sm mt-1">Platform Status: <span className="text-orange-500 font-bold">{view === 'map' ? 'Global' : 'Audit'}</span></p>
+                            </div>
+
                             {view === 'map' && (
-                                <div className={`flex rounded-xl p-1.5 ${darkMode ? 'bg-slate-900' : 'bg-slate-200'}`}>
-                                    <button onClick={() => setMapType('electricity')} className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${mapType === 'electricity' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500'}`}><Icon name="Zap" size={18}/><span className="font-bold text-sm">Electricity</span></button>
-                                    <button onClick={() => setMapType('water')} className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${mapType === 'water' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500'}`}><Icon name="Droplets" size={18}/><span className="font-bold text-sm">Water</span></button>
+                                <div className={`flex rounded-xl p-1 lg:p-1.5 ${darkMode ? 'bg-slate-900' : 'bg-slate-200'}`}>
+                                    <button onClick={() => setMapType('electricity')} className={`flex items-center gap-1.5 px-3 py-1.5 lg:px-6 lg:py-2 rounded-lg transition-all ${mapType === 'electricity' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500'}`}>
+                                        <Icon name="Zap" size={14}/>
+                                        <span className="font-bold text-[10px] lg:text-sm">Elec</span>
+                                    </button>
+                                    <button onClick={() => setMapType('water')} className={`flex items-center gap-1.5 px-3 py-1.5 lg:px-6 lg:py-2 rounded-lg transition-all ${mapType === 'water' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500'}`}>
+                                        <Icon name="Droplets" size={14}/>
+                                        <span className="font-bold text-[10px] lg:text-sm">Water</span>
+                                    </button>
                                 </div>
                             )}
                         </header>
 
-                        <div className="flex-1 p-8 grid grid-cols-12 gap-8 overflow-hidden">
-                            <div className="col-span-9 h-full relative overflow-hidden">
+                        {/* Workspace */}
+                        <div className="flex-1 p-4 lg:p-8 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-8 overflow-hidden pb-20 lg:pb-8">
+                            
+                            {/* Map/Report Area */}
+                            <div className="flex-[2] lg:col-span-9 h-full relative overflow-hidden">
                                 {view === 'map' ? (
-                                    <div className="h-full relative rounded-[2.5rem] overflow-hidden border border-slate-800/20 shadow-2xl bg-[#0f172a]">
+                                    <div className="h-full relative rounded-[1.5rem] lg:rounded-[2.5rem] overflow-hidden border border-slate-800/20 shadow-2xl bg-[#0f172a]">
                                         <div className={`absolute inset-0 transition-colors duration-500 ${darkMode ? 'bg-[#0f172a]' : 'bg-[#f1f5f9]'}`}>
                                             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#64748b 1px, transparent 1px), linear-gradient(90deg, #64748b 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center opacity-20 pointer-events-none"><Icon name="Crosshair" size={40} className="text-slate-500" /><span className="text-[10px] font-black uppercase tracking-widest mt-2">Northcliff Region</span></div>
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center opacity-20 pointer-events-none">
+                                                <Icon name="Crosshair" size={32} className="text-slate-500" />
+                                            </div>
                                             <div className="relative w-full h-full p-4">
                                                 {MOCK_SCHOOLS.map(school => {
                                                     const statusKey = mapType === 'electricity' ? school.elecStatus : school.waterStatus;
@@ -236,9 +275,10 @@
                                                         <div key={school.id} className="absolute transform -translate-x-1/2 -translate-y-full" style={{ left: `${school.coords.x}%`, top: `${school.coords.y}%` }}>
                                                             <CustomPin color={STATUS_COLORS[statusKey]} isActive={school.active} isRed={statusKey === 'RED'} onClick={() => setSelectedSchool(school)} onMouseEnter={() => setHoveredSchool(school)} onMouseLeave={() => setHoveredSchool(null)} />
                                                             {hoveredSchool?.id === school.id && (
-                                                                <div className={`absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-3 w-56 p-4 rounded-2xl shadow-2xl border z-[100] backdrop-blur-md ${darkMode ? 'bg-slate-900/95 border-slate-700' : 'bg-white/95 border-slate-200'}`}>
-                                                                    <p className="text-[10px] font-black text-slate-500 uppercase mb-1 tracking-widest">{school.type} School</p><p className="text-xs font-bold mb-3 truncate">{school.name}</p>
-                                                                    {school.active ? <div className="flex justify-between items-center bg-slate-800/20 p-2 rounded-lg text-[10px] font-bold uppercase text-slate-500">View Deep Audit<Icon name="ArrowLeft" className="rotate-180" size={10} /></div> : <button className="w-full bg-orange-500 text-white text-[10px] font-black py-2 rounded-xl">CLAIM SCHOOL</button>}
+                                                                <div className={`absolute bottom-[115%] left-1/2 -translate-x-1/2 mb-3 w-40 lg:w-56 p-2 lg:p-4 rounded-xl lg:rounded-2xl shadow-2xl border z-[100] backdrop-blur-md ${darkMode ? 'bg-slate-900/95 border-slate-700' : 'bg-white/95 border-slate-200'}`}>
+                                                                    <p className="text-[8px] lg:text-[10px] font-black text-slate-500 uppercase mb-1 tracking-widest">{school.type}</p>
+                                                                    <p className="text-[10px] lg:text-xs font-bold mb-2 lg:mb-3 truncate">{school.name}</p>
+                                                                    {school.active ? <div className="flex justify-between items-center bg-slate-800/20 p-2 rounded-lg text-[8px] lg:text-[10px] font-bold uppercase text-slate-500">View Audit<Icon name="ArrowLeft" className="rotate-180" size={10} /></div> : <button className="w-full bg-orange-500 text-white text-[8px] lg:text-[10px] font-black py-1.5 rounded-lg">CLAIM</button>}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -246,14 +286,16 @@
                                                 })}
                                             </div>
                                         </div>
-                                        <div className={`absolute bottom-8 left-8 p-6 rounded-3xl border shadow-2xl z-50 ${darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'} backdrop-blur-lg`}>
-                                            <h4 className="text-[10px] font-black uppercase tracking-tighter text-slate-500 mb-4 text-center">Indicator Keys</h4>
-                                            <div className="space-y-3">
-                                                <div className="flex items-center gap-3"><div className="relative"><div className="w-3 h-3 rounded-full bg-red-500" /><div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-20" /></div><span className="text-[11px] font-bold uppercase">Above Average (RED)</span></div>
-                                                <div className="flex items-center gap-3"><div className="w-3 h-3 rounded-full bg-amber-500" /><span className="text-[11px] font-bold uppercase">Attention (YELLOW)</span></div>
-                                                <div className="flex items-center gap-3"><div className="w-3 h-3 rounded-full bg-green-500" /><span className="text-[11px] font-bold uppercase">Efficient (GREEN)</span></div>
+                                        
+                                        {/* Legend: Responsive positioning and scale */}
+                                        <div className={`absolute bottom-4 left-4 lg:bottom-8 lg:left-8 p-3 lg:p-6 rounded-2xl lg:rounded-3xl border shadow-2xl z-50 transition-all ${darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'} backdrop-blur-lg scale-90 lg:scale-100 origin-bottom-left`}>
+                                            <h4 className="text-[8px] lg:text-[10px] font-black uppercase tracking-tighter text-slate-500 mb-2 lg:mb-4 text-center">Keys</h4>
+                                            <div className="space-y-2 lg:space-y-3">
+                                                <div className="flex items-center gap-2 lg:gap-3"><div className="relative"><div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-red-500" /><div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-20" /></div><span className="text-[9px] lg:text-[11px] font-bold uppercase">Waste (RED)</span></div>
+                                                <div className="flex items-center gap-2 lg:gap-3"><div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-amber-500" /><span className="text-[9px] lg:text-[11px] font-bold uppercase">Alert (YELLOW)</span></div>
+                                                <div className="flex items-center gap-2 lg:gap-3"><div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-green-500" /><span className="text-[9px] lg:text-[11px] font-bold uppercase">Optimal (GREEN)</span></div>
                                                 <hr className="border-slate-800/50" />
-                                                <div className="flex items-center gap-3 opacity-60"><div className="w-3 h-3 rounded-full bg-slate-400" /><span className="text-[11px] font-bold italic tracking-tight uppercase">NOT PRESENTLY IN DATABASE</span></div>
+                                                <div className="flex items-center gap-2 lg:gap-3 opacity-60"><div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-slate-400" /><span className="text-[8px] lg:text-[11px] font-bold italic uppercase leading-none">NO DATA</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -262,37 +304,42 @@
                                 )}
                             </div>
 
-                            <div className="col-span-3 flex flex-col h-full gap-6 overflow-hidden">
-                                <div className={`p-8 rounded-[2.5rem] border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
-                                    <h3 className="font-black text-xs uppercase tracking-widest text-slate-500 mb-6">Coverage</h3>
-                                    <div className="flex items-baseline gap-2 mb-4"><span className="text-4xl font-black text-orange-500">{activeStats.active}</span><span className="text-slate-500 text-xs font-bold uppercase">/ {activeStats.total}</span></div>
+                            {/* Sidebar Area: Collapses/Stacks on Mobile */}
+                            <div className={`flex-1 lg:col-span-3 flex flex-col gap-4 lg:gap-6 overflow-hidden transition-all ${view !== 'map' ? 'hidden lg:flex' : 'flex'}`}>
+                                <div className={`p-4 lg:p-8 rounded-[1.5rem] lg:rounded-[2.5rem] border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+                                    <h3 className="font-black text-[10px] lg:text-xs uppercase tracking-widest text-slate-500 mb-4 lg:mb-6">Coverage</h3>
+                                    <div className="flex items-baseline gap-2 mb-2 lg:mb-4">
+                                        <span className="text-2xl lg:text-4xl font-black text-orange-500">{activeStats.active}</span>
+                                        <span className="text-slate-500 text-[10px] lg:text-xs font-bold uppercase">/ {activeStats.total}</span>
+                                    </div>
                                     <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden"><div className="bg-orange-500 h-full transition-all" style={{ width: `${(activeStats.active / activeStats.total) * 100}%` }} /></div>
                                 </div>
-                                <div className={`flex-1 p-8 rounded-[2.5rem] border transition-all overflow-y-auto ${selectedSchool ? (darkMode ? 'bg-slate-900 border-orange-500/30 shadow-xl' : 'bg-white border-orange-200 shadow-xl') : (darkMode ? 'bg-slate-900/20 border-slate-800' : 'bg-slate-100 border-slate-300')}`}>
+                                
+                                <div className={`flex-1 p-6 lg:p-8 rounded-[1.5rem] lg:rounded-[2.5rem] border transition-all overflow-y-auto ${selectedSchool ? (darkMode ? 'bg-slate-900 border-orange-500/30 shadow-xl' : 'bg-white border-orange-200 shadow-xl') : (darkMode ? 'bg-slate-900/20 border-slate-800' : 'bg-slate-100 border-slate-300')}`}>
                                     {selectedSchool ? (
                                         <div className="h-full flex flex-col">
-                                            <div className="flex items-start gap-4 mb-8">
-                                                <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">{selectedSchool.active ? <Icon name="Sun" className="text-orange-500" size={28} /> : <Icon name="MapPin" className="text-slate-500" size={28} />}</div>
-                                                <div className="overflow-hidden"><h4 className="font-black text-lg leading-tight truncate">{selectedSchool.name}</h4><p className="text-[10px] text-slate-500 font-black uppercase mt-2 tracking-widest bg-slate-800 inline-block px-2 py-1 rounded-md">{selectedSchool.type} School</p></div>
+                                            <div className="flex items-start gap-3 lg:gap-4 mb-6 lg:mb-8">
+                                                <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">{selectedSchool.active ? <Icon name="Sun" className="text-orange-500" size={24} /> : <Icon name="MapPin" className="text-slate-500" size={24} />}</div>
+                                                <div className="overflow-hidden"><h4 className="font-black text-sm lg:text-lg leading-tight truncate">{selectedSchool.name}</h4><p className="text-[8px] lg:text-[10px] text-slate-500 font-black uppercase mt-1 tracking-widest bg-slate-800 inline-block px-2 py-0.5 rounded-md">{selectedSchool.type}</p></div>
                                             </div>
                                             {selectedSchool.active ? (
-                                                <div className="space-y-6">
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700"><p className="text-[9px] font-black text-slate-500 uppercase mb-1">kWh</p><p className="font-black text-lg">{selectedSchool.consumption.elec.toLocaleString()}</p></div>
-                                                        <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700"><p className="text-[9px] font-black text-slate-500 uppercase mb-1">kL</p><p className="font-black text-lg">{selectedSchool.consumption.water.toLocaleString()}</p></div>
+                                                <div className="space-y-4 lg:space-y-6">
+                                                    <div className="grid grid-cols-2 gap-2 lg:gap-3">
+                                                        <div className="p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-slate-800/50 border border-slate-700 text-center"><p className="text-[8px] font-black text-slate-500 uppercase mb-1">kWh</p><p className="font-black text-sm lg:text-lg">{selectedSchool.consumption.elec.toLocaleString()}</p></div>
+                                                        <div className="p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-slate-800/50 border border-slate-700 text-center"><p className="text-[8px] font-black text-slate-500 uppercase mb-1">kL</p><p className="font-black text-sm lg:text-lg">{selectedSchool.consumption.water.toLocaleString()}</p></div>
                                                     </div>
-                                                    <div className="p-5 rounded-3xl bg-orange-500/5 border border-orange-500/10"><h5 className="text-[10px] font-black uppercase text-orange-500 mb-2">Efficiency Rating: {selectedSchool.grade}</h5><p className="text-xs text-slate-400 font-medium">Currently {selectedSchool.elecStatus === 'RED' ? 'performing below' : 'meeting'} area standard.</p></div>
-                                                    <button onClick={() => setView('report')} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-widest mt-auto shadow-lg shadow-orange-500/20">Open Full Audit Report</button>
+                                                    <div className="p-4 lg:p-5 rounded-2xl lg:rounded-3xl bg-orange-500/5 border border-orange-500/10"><h5 className="text-[9px] lg:text-[10px] font-black uppercase text-orange-500 mb-1">Rating: {selectedSchool.grade}</h5><p className="text-[9px] lg:text-xs text-slate-400 font-medium">Analysis is complete.</p></div>
+                                                    <button onClick={() => setView('report')} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-3 lg:py-4 rounded-xl lg:rounded-2xl text-[10px] uppercase tracking-widest mt-auto shadow-lg shadow-orange-500/20">Audit Report</button>
                                                 </div>
                                             ) : (
                                                 <div className="flex-1 flex flex-col items-center justify-center text-center">
-                                                    <div className="w-16 h-16 bg-slate-800/30 rounded-full flex items-center justify-center mb-6 border border-slate-700 border-dashed"><Icon name="Search" size={24} className="text-slate-600" /></div>
-                                                    <button className="w-full bg-orange-500 text-white font-black py-4 rounded-2xl text-[10px] uppercase">CLAIM SCHOOL</button>
+                                                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-slate-800/30 rounded-full flex items-center justify-center mb-4 lg:mb-6 border border-slate-700 border-dashed"><Icon name="Search" size={20} className="text-slate-600" /></div>
+                                                    <button className="w-full bg-orange-500 text-white font-black py-3 lg:py-4 rounded-xl text-[10px] uppercase">CLAIM</button>
                                                 </div>
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="h-full flex flex-col items-center justify-center text-center px-6"><Icon name="Map" size={24} className="text-slate-700 mb-4" /><p className="text-[10px] text-slate-500 leading-relaxed uppercase font-bold tracking-tight">Select a facility marker to analyze consumption data.</p></div>
+                                        <div className="h-full flex flex-col items-center justify-center text-center px-4"><Icon name="Map" size={20} className="text-slate-700 mb-2" /><p className="text-[9px] lg:text-[10px] text-slate-500 leading-relaxed uppercase font-bold tracking-tight">Select a pin to analyze.</p></div>
                                     )}
                                 </div>
                             </div>
